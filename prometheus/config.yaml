@@ -1,0 +1,17 @@
+global:
+  scrape_interval:  15s
+scrape_configs:
+  - job_name: 'statsd'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['statsd_exporter:9102']
+        labels:
+          group: 'services'
+  - job_name: 'service-a'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['service_a:8080']
+  - job_name: 'service-b'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['service_b:8081']

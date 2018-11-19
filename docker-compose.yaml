@@ -1,0 +1,74 @@
+version: '3'
+services:
+  service_a_envoy:
+    image: envoyproxy/envoy-alpine:6cc80cb7d759a9da40f65a7d63b5c316214e9e7e
+    volumes:
+      - ./services/serviceA/envoy.yaml:/etc/envoy.yaml
+    ports:
+      - "9901:9901"
+      - "8881:8881"
+    command: "/usr/local/bin/envoy -c /etc/envoy.yaml --v2-config-only -l info --service-cluster 'service-a' --service-node 'service-a' --log-format '[METADATA][%Y-%m-%d %T.%e][%t][%l][%n] %v'"
+
+  service_a:
+    build: services/serviceA/
+    ports:
+    - "8080:8080"
+
+  service_b_envoy:
+    image: envoyproxy/envoy-alpine:6cc80cb7d759a9da40f65a7d63b5c316214e9e7e
+    volumes:
+      - ./services/serviceB/envoy.yaml:/etc/envoy.yaml
+    ports:
+      - "9902:9902"
+      - "3002:3002"
+      - "8882:8882"
+    command: "/usr/local/bin/envoy -c /etc/envoy.yaml --v2-config-only -l info --service-cluster 'service-b' --service-node 'service-b' --log-format '[METADATA][%Y-%m-%d %T.%e][%t][%l][%n] %v'"  
+
+  service_b:
+    build: services/serviceB/
+    ports:
+    - "8081:8081"
+
+  service_c_envoy:
+    image: envoyproxy/envoy-alpine:v1.8.0
+    volumes:
+      - ./services/serviceC/envoy.yaml:/etc/envoy.yaml
+    ports:
+      - "8790:8790"
+    command: "/usr/local/bin/envoy -c /etc/envoy.yaml --v2-config-only -l info --service-cluster 'service-c' --service-node 'service-c' --log-format '[METADATA][%Y-%m-%d %T.%e][%t][%l][%n] %v'"  
+
+  service_c:
+    build: services/serviceC/
+    ports:
+    - "8083:8083"
+
+  statsd_exporter:
+    image: prom/statsd-exporter:latest
+    ports:
+    - "9125:9125"
+    - "9102:9102"
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/config.yaml:/etc/prometheus.yaml
+    ports:
+    - "9090:9090"
+    command: "--config.file=/etc/prometheus.yaml"
+  
+  zipkin:
+    image: openzipkin/zipkin
+    expose:
+      - "9411"
+    ports: 
+    - "9411:9411"
+
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yaml
+      - ./grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml
+      - ./grafana/dashboard.json:/etc/grafana/provisioning/dashboards/dashboard.json
+    ports:
+    - "3000:3000"
