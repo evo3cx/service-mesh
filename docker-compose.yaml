@@ -57,11 +57,12 @@ services:
     command: "--config.file=/etc/prometheus.yaml"
   
   zipkin:
-    image: openzipkin/zipkin
-    expose:
-      - "9411"
-    ports: 
-    - "9411:9411"
+    image: jaegertracing/all-in-one
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411
+    ports:
+      - 9411:9411
+      - 16686:16686
 
   grafana:
     image: grafana/grafana

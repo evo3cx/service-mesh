@@ -49,7 +49,7 @@ func CreateRequest(serviceName, address string, headers http.Header) {
 		return
 	}
 
-	req.Header = headerTracer(http.Header{}, serviceName)
+	req.Header = headerTracer(headers, serviceName)
 	resp, err := client.Do(req)
 	if err != nil {
 		status = "fail"
@@ -82,7 +82,6 @@ func headerTracer(headers http.Header, serviceName string) http.Header {
 		headers.Add("X-B3-TraceId", tracID.String())
 	}
 
-	headers.Add("X-B3-Sampled", "1")
 	headers.Add("Service-Name", serviceName)
 
 	return headers

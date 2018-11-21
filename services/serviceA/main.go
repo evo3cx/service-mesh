@@ -9,6 +9,7 @@ import (
 	"github.com/evo3cx/service-mesh/services"
 	"github.com/julienschmidt/httprouter"
 	"github.com/prometheus/client_golang/prometheus"
+	uuid "github.com/satori/go.uuid"
 )
 
 func main() {
@@ -26,8 +27,11 @@ func main() {
 
 func clientRequest() {
 	for {
-		services.CreateRequest("service-A", "http://service_a_envoy:8881/", http.Header{})
-		time.Sleep(1 * time.Second)
+		reqId, _ := uuid.NewV4()
+		headers := http.Header{}
+		headers.Add("X-Request-Id", reqId.String())
+		services.CreateRequest("service-B", "http://service_a_envoy:8881/", headers)
+		time.Sleep(9 * time.Second)
 	}
 }
 

@@ -11,6 +11,7 @@ tracing:
     config:
       collector_cluster: zipkin
       collector_endpoint: "/api/v1/spans"
+      shared_span_context: false
 
 admin:
   access_log_path: "/tmp/admin_access.log"
@@ -48,8 +49,8 @@ static_resources:
                       response_code: "%RESPONSE_CODE%"
                 stat_prefix: "ingress_3002"
                 codec_type: "AUTO"
-                tracing: 
-                  operation_name: 1
+                tracing:
+                  operation_name: ingress
                 route_config:
                   name: "service-b-svc-http-route"
                   virtual_hosts:
@@ -67,8 +68,7 @@ static_resources:
                   -
                     name: "envoy.router"
     
-    -
-      name: "service-c-svc-http-listener"
+    - name: "service-c-svc-http-listener"
       address:
         socket_address:
           address: "0.0.0.0"
@@ -94,6 +94,8 @@ static_resources:
                       response_code: "%RESPONSE_CODE%"
                 stat_prefix: "egress_service_c"
                 codec_type: "AUTO"
+                tracing:
+                  operation_name: egress
                 route_config:
                   name: "service-c-svc-http-route"
                   virtual_hosts:

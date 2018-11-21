@@ -11,7 +11,6 @@ import (
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	services.CreateRequest("service-B", "http://service_b_envoy:8882/", r.Header)
-
 	fmt.Fprintf(w, "Hello from service B")
 }
 
